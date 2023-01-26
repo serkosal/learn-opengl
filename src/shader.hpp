@@ -26,7 +26,7 @@ public:
     static std::filesystem::path directory;
     
     //loads shaders(vertex and fragment) from: directory + path + (.vs | .fs)
-    Shader(const std::filesystem::path& path);
+    Shader(const std::filesystem::path& path, bool standart_dir = true);
 
     Shader() = delete;
     Shader(const Shader& other) = delete;
@@ -106,7 +106,7 @@ public:
 
 std::filesystem::path Shader::directory = "../resources/shaders/";
 
-Shader::Shader(const std::filesystem::path& path)
+Shader::Shader(const std::filesystem::path& path, bool standart_dir)
 {
     std::string vertexCode;
     std::string fragmentCode;
@@ -117,8 +117,12 @@ Shader::Shader(const std::filesystem::path& path)
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-    vShaderFile.open((directory / path).string() + ".vs");
-    fShaderFile.open((directory / path).string() + ".fs");
+    auto vertexPath = standart_dir ? directory / path : path;
+    auto fragmentPath = vertexPath;
+
+    vShaderFile.open(vertexPath.concat(".vs").string());
+    fShaderFile.open(fragmentPath.concat(".fs").string());
+
     std::stringstream vShaderStream, fShaderStream;
     // read file's buffer contents into streams
     vShaderStream << vShaderFile.rdbuf();

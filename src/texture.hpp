@@ -51,7 +51,12 @@ public:
             this->del();
     }
 
-    inline Texture(const std::filesystem::path& path, Type type = Type::diffuse, bool flip=true);
+    inline Texture(
+        const std::filesystem::path& path, 
+        Type type = Type::diffuse,
+        bool flip=true,
+        bool standart_dir=true
+    );
 
     void bind() const { glBindTexture(GL_TEXTURE_2D, _id); }
     void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
@@ -59,7 +64,7 @@ public:
 
 std::filesystem::path Texture::directory = "../resources/textures/";
 
-inline Texture::Texture(const std::filesystem::path& path, Type type, bool flip) 
+inline Texture::Texture(const std::filesystem::path& path, Type type, bool flip, bool standart_dir) 
     : _type(type)
 {
     glGenTextures(1, &_id);
@@ -73,7 +78,9 @@ inline Texture::Texture(const std::filesystem::path& path, Type type, bool flip)
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load((directory / path).c_str(), &width, &height, &nrChannels, 0);
+    auto result_path = standart_dir ? directory / path : path;
+
+    unsigned char *data = stbi_load(result_path.c_str(), &width, &height, &nrChannels, 0);
     if(data)
     {
         GLenum format;
