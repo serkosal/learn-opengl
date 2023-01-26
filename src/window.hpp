@@ -9,6 +9,7 @@
 
 #include <string_view>
 #include <stdexcept>
+#include <utility>
 
 class Window
 {
@@ -52,6 +53,13 @@ public:
     {
         glfwSwapBuffers(_window);
     }
+
+    std::pair<int, int> get_size()
+    {   
+        std::pair<int, int> size;
+        glfwGetWindowSize(_window, &size.first, &size.second);
+        return size;
+    }
 };
 
 
@@ -78,7 +86,7 @@ inline Window::Window(int width, int height, std::string_view title, bool isFull
     glfwMakeContextCurrent(_window);
 
     glfwSetFramebufferSizeCallback(_window, 
-        [](GLFWwindow* _window, int width, int height) -> void
+        [](GLFWwindow* window, int width, int height) -> void
         {
             glViewport(0, 0, width, height);
         }
@@ -87,6 +95,8 @@ inline Window::Window(int width, int height, std::string_view title, bool isFull
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         throw std::runtime_error("Failed to initialize GLAD");
 
+    auto [new_width, new_height] = get_size();
+    glViewport(0, 0, new_width, new_height);
 
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
