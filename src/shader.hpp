@@ -26,7 +26,7 @@ public:
     static std::filesystem::path directory;
     
     //loads shaders(vertex and fragment) from: directory + path + (.vs | .fs)
-    Shader(std::filesystem::path path);
+    Shader(const std::filesystem::path& path);
 
     Shader() = delete;
     Shader(const Shader& other) = delete;
@@ -104,7 +104,9 @@ public:
     }
 };
 
-Shader::Shader(std::filesystem::path path)
+std::filesystem::path Shader::directory = "../resources/shaders/";
+
+Shader::Shader(const std::filesystem::path& path)
 {
     std::string vertexCode;
     std::string fragmentCode;
@@ -153,8 +155,6 @@ Shader::Shader(std::filesystem::path path)
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
-
-std::filesystem::path Shader::directory = "../resources/shaders/";
 
 void Shader::check_errors(GLuint id, std::string type) const
 {
