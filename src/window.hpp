@@ -60,6 +60,12 @@ public:
         glfwGetWindowSize(_window, &size.first, &size.second);
         return size;
     }
+    
+    float aspect_ratio()
+    {
+        auto[width, height] = get_size();
+        return width / float(height);
+    }
 };
 
 

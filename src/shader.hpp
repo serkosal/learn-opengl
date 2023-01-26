@@ -26,7 +26,7 @@ public:
     static std::filesystem::path directory;
     
     //loads shaders(vertex and fragment) from: directory + path + (.vs | .fs)
-    Shader(const std::filesystem::path& path, bool standart_dir = true);
+    inline Shader(const std::filesystem::path& path, bool standart_dir = true);
 
     Shader() = delete;
     Shader(const Shader& other) = delete;
@@ -106,7 +106,7 @@ public:
 
 std::filesystem::path Shader::directory = "../resources/shaders/";
 
-Shader::Shader(const std::filesystem::path& path, bool standart_dir)
+inline Shader::Shader(const std::filesystem::path& path, bool standart_dir)
 {
     std::string vertexCode;
     std::string fragmentCode;

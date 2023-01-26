@@ -3,7 +3,7 @@
 #include "shader.hpp"
 #include "texture.hpp"
 
-#include "third_party/glad/glad.h"
+#include "third_party/glm/gtc/matrix_transform.hpp"
 
 int main()
 {
@@ -52,6 +52,9 @@ int main()
         20, 21, 22,    20, 22, 23 
     });
 
+    glm::mat4 model(1.f);
+    model = glm::translate(model, glm::vec3(0.f, 0.f, -3.f));
+
     shader_basic.use();
     texture.bind();
     while(window.is_open())
@@ -62,6 +65,10 @@ int main()
         window.poll_events();
 
         window.clear_src();
+
+        model = glm::rotate(model, glm::radians(-45.f * float(elapsedTime)), glm::vec3(0.f, 1.f, 0.0));
+        shader_basic.setMat4("model", model);
+        shader_basic.setMat4("projection", glm::perspective(45.f, window.aspect_ratio(), 0.1f, 100.f));
 
         cube.draw();
 

@@ -103,6 +103,4 @@ inline Texture::Texture(const std::filesystem::path& path, Type type, bool flip,
     }
 }
 
-
-
 #endif
