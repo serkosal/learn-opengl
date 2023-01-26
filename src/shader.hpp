@@ -115,8 +115,8 @@ Shader::Shader(std::filesystem::path path)
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-    vShaderFile.open((directory / path).generic_string() + ".vs");
-    fShaderFile.open((directory / path).generic_string() + ".fs");
+    vShaderFile.open((directory / path).string() + ".vs");
+    fShaderFile.open((directory / path).string() + ".fs");
     std::stringstream vShaderStream, fShaderStream;
     // read file's buffer contents into streams
     vShaderStream << vShaderFile.rdbuf();
