@@ -2,6 +2,7 @@
 #include "mesh.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
+#include "camera.hpp"
 
 #include "third_party/glm/gtc/matrix_transform.hpp"
 
@@ -15,6 +16,7 @@ int main()
     Texture texture;
     texture.init("brick_wall_texture.jpg");
 
+    Camera camera;
 
     Mesh cube(std::vector<Vertex>{
         {{ -0.5f, -0.5f, -0.5f},  {  0.0f,  0.0f, -1.0f}, { 0.f, 0.f } }, // 0
@@ -61,6 +63,8 @@ int main()
 
     shader_basic.use();
     texture.bind();
+
+    bool isW = false, isA = false, isS = false, isD = false;
     while(window.is_open())
     {
         auto elapsedTime = window.elapsed_time();
@@ -68,14 +72,33 @@ int main()
         //processing input
         window.poll_events();
 
+        //window closing
         if (window.is_key_pressed(Window::key::q))
             window.close();
 
+        //camera movement
+        glm::vec3 move_offset(0.f);
+
+        if (isW = !isW && window.is_key_pressed(Window::key::w))
+            move_offset -= camera.get_dir();
+        if (isA = !isA && window.is_key_pressed(Window::key::a))
+            move_offset += camera.get_right();
+        if (isS = !isS && window.is_key_pressed(Window::key::s))
+            move_offset += camera.get_dir();
+        if (isD = !isD && window.is_key_pressed(Window::key::d))
+            move_offset -= camera.get_right();
+        
+        move_offset *= camera._speed * elapsedTime;
+
+        camera.move(move_offset);
+
+        //rendering
         window.clear_src();
 
-        model = glm::rotate(model, glm::radians(-45.f * float(elapsedTime)), glm::vec3(0.f, 1.f, 0.0));
+        //model = glm::rotate(model, glm::radians(-45.f * float(elapsedTime)), glm::vec3(0.f, 1.f, 0.0));
         shader_basic.setMat4("model", model);
-        shader_basic.setMat4("projection", glm::perspective(45.f, window.aspect_ratio(), 0.1f, 100.f));
+        shader_basic.setMat4("view", camera.get_view());
+        shader_basic.setMat4("projection", camera.get_proj(window.aspect_ratio()));
 
         cube.draw();
 
