@@ -6,6 +6,7 @@
 
 #include "third_party/glad/glad.h"
 #include "third_party/GLFW/glfw3.h"
+#include "third_party/glm/glm.hpp"
 
 #include <string_view>
 #include <stdexcept>
@@ -17,6 +18,8 @@ private:
     GLFWwindow* _window = nullptr;
     double _oldTime;
 public:
+    enum class key;
+    
     Window() = delete;
 
     Window(int width, int height, std::string_view title, bool isFullscreen=false);
@@ -31,8 +34,8 @@ public:
         glfwTerminate();
     }
 
-    bool is_open() { return !glfwWindowShouldClose(_window); }
-    double getElapsedTime()
+    bool is_open() const { return !glfwWindowShouldClose(_window); }
+    double elapsed_time()
     {
         auto newTime = glfwGetTime();
         auto elapsedTime = _oldTime - newTime;
@@ -40,34 +43,45 @@ public:
 
         return elapsedTime;
     }
-    void clear_src()
+    void clear_src(const glm::vec3& color = glm::vec3(1.f)) const
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.f);
+        glClearColor(color.r, color.g, color.b, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-    void poll_events()
+    void poll_events() const
     {
         glfwPollEvents();
     }
-    void blit_scr()
+    void blit_scr() const
     {
         glfwSwapBuffers(_window);
     }
 
-    std::pair<int, int> get_size()
+    std::pair<int, int> get_size() const
     {   
         std::pair<int, int> size;
         glfwGetWindowSize(_window, &size.first, &size.second);
         return size;
     }
     
-    float aspect_ratio()
+    float aspect_ratio() const
     {
         auto[width, height] = get_size();
         return width / float(height);
     }
-};
 
+    const GLFWwindow* const get_ptr() const { return _window; }
+
+    void close() const
+    {
+        glfwSetWindowShouldClose(_window, true);
+    }
+
+    bool is_key_pressed(Window::key key)
+    {
+        return glfwGetKey(_window, int(key));
+    }
+};
 
 //string_view is used for avoid unnecessary copying of memory
 inline Window::Window(int width, int height, std::string_view title, bool isFullscreen)
@@ -110,5 +124,75 @@ inline Window::Window(int width, int height, std::string_view title, bool isFull
 
     _oldTime = glfwGetTime();
 }
+
+enum class Window::key
+{
+space       = GLFW_KEY_SPACE,
+apostrophe  = GLFW_KEY_APOSTROPHE,
+comma       = GLFW_KEY_COMMA,    
+minus,    
+period,   
+slash,
+
+_0 = GLFW_KEY_0,
+_1, _2, _3, _4, _5, _6, _7, _8, 
+_9,
+
+semicolon   = GLFW_KEY_SEMICOLON,
+equal       = GLFW_KEY_EQUAL,    
+
+a = GLFW_KEY_A,
+b, c, d, e, f, g, h, i, j, k, l, m,
+n, o, p, q, r, s, t, u, v, w, x, y, 
+z,
+
+escape = GLFW_KEY_ESCAPE,      
+enter,
+tab,
+backspace,
+insert,
+del,    
+right,
+left,        
+down,
+up,         
+page_up,
+page_down,
+home,    
+end,
+
+caps_lock = GLFW_KEY_CAPS_LOCK,    
+scroll_lock,
+num_lock,     
+print_screen,
+pause,
+
+f1 = GLFW_KEY_F1,        
+f2, f3, f4, f5, f6, f7, f8, f9, f10, f11,
+f12,
+
+num_0 = GLFW_KEY_KP_0,    
+num_1, num_2, num_3, num_4,
+num_5, num_6, num_7, num_8,
+num_9,
+
+num_decimal,    
+num_divide,    
+num_multiply,
+num_subtract,
+num_add,
+num_enter,       
+num_equal,
+
+left_shift = GLFW_KEY_LEFT_SHIFT,
+left_ctrl,
+left_alt,     
+left_super,
+
+right_shift,
+right_ctrl,
+right_alt,    
+right_super,
+};
 
 #endif

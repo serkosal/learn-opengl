@@ -63,10 +63,13 @@ int main()
     texture.bind();
     while(window.is_open())
     {
-        auto elapsedTime = window.getElapsedTime();
+        auto elapsedTime = window.elapsed_time();
         
         //processing input
         window.poll_events();
+
+        if (window.is_key_pressed(Window::key::q))
+            window.close();
 
         window.clear_src();
 
