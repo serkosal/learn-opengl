@@ -8,8 +8,12 @@
 int main()
 {
     Window window(1280, 720, "Learn openGL");
-    Shader shader_basic("basic");
-    Texture texture("brick_wall_texture.jpg");
+
+    Shader shader_basic;
+    shader_basic.init("basic");
+
+    Texture texture;
+    texture.init("brick_wall_texture.jpg");
 
 
     Mesh cube(std::vector<Vertex>{

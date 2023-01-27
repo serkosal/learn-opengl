@@ -14,32 +14,28 @@ class Texture
 {
 public:
     static std::filesystem::path directory;
-
-    enum class Type {
-        unknown = -1,
-
-        diffuse,
-        specular,
-    };
 private:
     GLuint _id = 0;
-    Type _type = Type::diffuse;
 
-    void del() { glDeleteTextures(1, &_id); }
+    void del() 
+    {
+        if(_id) 
+            glDeleteTextures(1, &_id);
+        _id = 0;
+    }
 public:
-    Texture() = delete;
+    Texture() = default;
     
     Texture(const Texture& other) = delete;
     Texture& operator=(const Texture& other) = delete;
 
-    Texture(Texture&& other) : _id(other._id), _type(other._type)
+    Texture(Texture&& other) : _id(other._id)
     {
         other._id = 0;
     }
     Texture& operator=(Texture&& other)
     {
         this->_id = other._id;
-        this->_type = other._type;
         other._id = 0;
 
         return *this;
@@ -53,7 +49,12 @@ public:
 
     inline Texture(
         const std::filesystem::path& path, 
-        Type type = Type::diffuse,
+        bool flip=true,
+        bool standart_dir=true
+    ) { init(path, flip, standart_dir); }
+
+    inline void init(
+        const std::filesystem::path& path, 
         bool flip=true,
         bool standart_dir=true
     );
@@ -64,9 +65,11 @@ public:
 
 std::filesystem::path Texture::directory = "../resources/textures/";
 
-inline Texture::Texture(const std::filesystem::path& path, Type type, bool flip, bool standart_dir) 
-    : _type(type)
+inline void Texture::init(const std::filesystem::path& path, bool flip, bool standart_dir)
 {
+    if (_id)
+        del();
+    
     glGenTextures(1, &_id);
     glBindTexture(GL_TEXTURE_2D, _id);
 

@@ -21,14 +21,16 @@ private:
     { 
         if(_id)
             glDeleteProgram(_id);
+        _id = 0;
     }
 public:
     static std::filesystem::path directory;
     
     //loads shaders(vertex and fragment) from: directory + path + (.vs | .fs)
-    inline Shader(const std::filesystem::path& path, bool standart_dir = true);
+    inline Shader(const std::filesystem::path& path, bool standart_dir = true)
+    { init(path, standart_dir); }
 
-    Shader() = delete;
+    Shader() = default;
     Shader(const Shader& other) = delete;
     Shader& operator=(const Shader& other) = delete;
     Shader(Shader&& other) = delete;
@@ -38,6 +40,8 @@ public:
     {
         del();
     }
+
+    inline void init(const std::filesystem::path& path, bool standart_dir=true);
 
     void use() const
     {
@@ -106,8 +110,11 @@ public:
 
 std::filesystem::path Shader::directory = "../resources/shaders/";
 
-inline Shader::Shader(const std::filesystem::path& path, bool standart_dir)
+inline void Shader::init(const std::filesystem::path& path, bool standart_dir)
 {
+    if (_id)
+        del();
+
     std::string vertexCode;
     std::string fragmentCode;
 
