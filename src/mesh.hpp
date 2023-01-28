@@ -19,8 +19,11 @@ public:
 
     Mesh() = delete;
 
-    inline Mesh(std::vector<Vertex> vertices);
-    inline Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
+    inline Mesh(const std::vector<Vertex>& vertices);
+    inline Mesh(
+        const std::vector<Vertex>& vertices,
+        const std::vector<GLuint>& indices
+    );
     
     Mesh(const Mesh& other) = delete;
     const Mesh& operator=(const Mesh& other) = delete;
@@ -66,7 +69,7 @@ public:
     }
 };
 
-inline Mesh::Mesh(std::vector<Vertex> vertices)
+inline Mesh::Mesh(const std::vector<Vertex>& vertices)
 {
     _indices_n = vertices.size() / 3;
 
@@ -87,7 +90,9 @@ inline Mesh::Mesh(std::vector<Vertex> vertices)
     glEnableVertexAttribArray(2);
 }
 
-inline Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices)
+inline Mesh::Mesh(
+    const std::vector<Vertex>& vertices,
+    const std::vector<GLuint>& indices)
 {
     _indices_n = indices.size();
     glGenVertexArrays(1, &_vao);
