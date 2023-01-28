@@ -17,6 +17,8 @@ class Window
 private:
     GLFWwindow* _window = nullptr;
     double _oldTime;
+
+    std::pair<double, double> mouse_old;
 public:
     enum class key;
     
@@ -81,6 +83,25 @@ public:
     {
         return glfwGetKey(_window, int(key));
     }
+
+    std::pair<double, double> get_mouse_pos() const
+    {
+        std::pair<double, double> pos;
+        glfwGetCursorPos(_window, &pos.first, &pos.second);
+        
+        return pos;
+    }
+
+    std::pair<double, double> get_mouse_offset()
+    {
+        auto[x, y] = get_mouse_pos();
+
+        std::pair offset(mouse_old.first - x, mouse_old.second - y);
+        
+        mouse_old = std::pair(x, y);
+
+        return offset;
+    }
 };
 
 //string_view is used for avoid unnecessary copying of memory
@@ -118,11 +139,14 @@ inline Window::Window(int width, int height, std::string_view title, bool isFull
     auto [new_width, new_height] = get_size();
     glViewport(0, 0, new_width, new_height);
 
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    //glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
 
     glEnable(GL_DEPTH_TEST);
 
     _oldTime = glfwGetTime();
+
+    mouse_old = get_mouse_pos();
 }
 
 enum class Window::key

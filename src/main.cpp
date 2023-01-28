@@ -92,6 +92,9 @@ int main()
 
         camera.move(move_offset);
 
+        auto[cursor_xoffset, cursor_yoffset] = window.get_mouse_offset();
+        camera.ProcessMouseMovement(-cursor_xoffset, cursor_yoffset);
+
         //rendering
         window.clear_src();
 

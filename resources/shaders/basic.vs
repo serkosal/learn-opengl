@@ -16,5 +16,5 @@ void main()
     TexCoord = aTex;
     Normal = aNor;
 
-    gl_Position = projection * model * view * vec4(aPos, 1.0);
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

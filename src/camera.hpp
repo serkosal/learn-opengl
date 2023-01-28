@@ -9,12 +9,12 @@ struct Camera
 {
     glm::vec3 _pos = glm::vec3(0.f);
 
-    float _yaw = 90.f;
+    float _yaw = -90.f;
     float _pitch = 0.f;
 
     float _fov = 45.f;
 
-    float _sensitivity = 1.f;
+    float _sensitivity = 0.1f;
     float _speed = 1.f;
 
     glm::vec3 _world_up = glm::vec3(0.f, 1.f, 0.f);
@@ -41,9 +41,9 @@ struct Camera
     {
         return glm::normalize(
             glm::vec3{
-                cos(glm::radians(_yaw)) * cos(glm::radians(_pitch)),
-                sin(glm::radians(_pitch)),
-                sin(glm::radians(_yaw)) * cos(glm::radians(_pitch))
+                 cos(glm::radians(_yaw)) * cos(glm::radians(_pitch)),
+                 sin(glm::radians(_pitch)),
+                 sin(glm::radians(_yaw)) * cos(glm::radians(_pitch))
             }
         );
     }
