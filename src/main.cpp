@@ -8,7 +8,7 @@
 
 int main()
 {
-    Window window(1280, 720, "Learn openGL");
+    Window window(1980, 1080, "Learn openGL", true);
 
     Shader shader_basic;
     shader_basic.init("basic");
@@ -65,6 +65,8 @@ int main()
     texture.bind();
 
     bool isW = false, isA = false, isS = false, isD = false;
+    camera.isActive = false;
+    camera.isCaptured = false;
     while(window.is_open())
     {
         auto elapsedTime = window.elapsed_time();
@@ -72,12 +74,32 @@ int main()
         //processing input
         window.poll_events();
 
+        //camera movement
+        glm::vec3 move_offset(0.f);
+
+        if (window.is_mouse_clicked() && !camera.isCaptured)
+            camera.isCaptured = camera.isActive = true;
+        else if (window.is_mouse_clicked() && camera.isCaptured)
+            camera.isCaptured = camera.isActive = false;
+        
+        if (!window.is_mouse_clicked())
+        {
+            if(camera.isCaptured)
+                window.set_cursor_mode(Window::cursor_modes::disabled);
+            else
+                window.set_cursor_mode(Window::cursor_modes::normal);
+        }
+        
+
+        if (camera.isActive)
+        {
+            auto[cursor_xoffset, cursor_yoffset] = window.get_mouse_offset();
+            camera.ProcessMouseMovement(-cursor_xoffset, cursor_yoffset);
+        }
+
         //window closing
         if (window.is_key_pressed(Window::key::q))
             window.close();
-
-        //camera movement
-        glm::vec3 move_offset(0.f);
 
         if (isW = !isW && window.is_key_pressed(Window::key::w))
             move_offset -= camera.get_dir();
@@ -92,8 +114,6 @@ int main()
 
         camera.move(move_offset);
 
-        auto[cursor_xoffset, cursor_yoffset] = window.get_mouse_offset();
-        camera.ProcessMouseMovement(-cursor_xoffset, cursor_yoffset);
 
         //rendering
         window.clear_src();

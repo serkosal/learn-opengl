@@ -19,6 +19,9 @@ struct Camera
 
     glm::vec3 _world_up = glm::vec3(0.f, 1.f, 0.f);
 
+    bool isActive = true;
+    bool isCaptured = false;
+
 
     void ProcessMouseMovement(float xoffset, float yoffset)
     {

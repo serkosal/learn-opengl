@@ -21,6 +21,18 @@ private:
     std::pair<double, double> mouse_old;
 public:
     enum class key;
+    enum class mouse
+    {
+        left  = GLFW_MOUSE_BUTTON_LEFT,
+        right = GLFW_MOUSE_BUTTON_RIGHT
+    };
+    enum class cursor_modes
+    {
+        normal   = GLFW_CURSOR_NORMAL,
+        hidden   = GLFW_CURSOR_HIDDEN,
+        disabled = GLFW_CURSOR_DISABLED,
+        captured = GLFW_CURSOR_CAPTURED
+    };
     
     Window() = delete;
 
@@ -84,6 +96,11 @@ public:
         return glfwGetKey(_window, int(key));
     }
 
+    bool is_mouse_clicked(Window::mouse mouse_key = Window::mouse::left)
+    {
+        return glfwGetMouseButton(_window, int(mouse_key));
+    }
+
     std::pair<double, double> get_mouse_pos() const
     {
         std::pair<double, double> pos;
@@ -101,6 +118,11 @@ public:
         mouse_old = std::pair(x, y);
 
         return offset;
+    }
+
+    void set_cursor_mode(Window::cursor_modes mode)
+    {
+        glfwSetInputMode(_window, GLFW_CURSOR, int(mode));
     }
 };
 
@@ -151,72 +173,72 @@ inline Window::Window(int width, int height, std::string_view title, bool isFull
 
 enum class Window::key
 {
-space       = GLFW_KEY_SPACE,
-apostrophe  = GLFW_KEY_APOSTROPHE,
-comma       = GLFW_KEY_COMMA,    
-minus,    
-period,   
-slash,
+    space       = GLFW_KEY_SPACE,
+    apostrophe  = GLFW_KEY_APOSTROPHE,
+    comma       = GLFW_KEY_COMMA,    
+    minus,    
+    period,   
+    slash,
 
-_0 = GLFW_KEY_0,
-_1, _2, _3, _4, _5, _6, _7, _8, 
-_9,
+    _0 = GLFW_KEY_0,
+    _1, _2, _3, _4, _5, _6, _7, _8, 
+    _9,
 
-semicolon   = GLFW_KEY_SEMICOLON,
-equal       = GLFW_KEY_EQUAL,    
+    semicolon   = GLFW_KEY_SEMICOLON,
+    equal       = GLFW_KEY_EQUAL,    
 
-a = GLFW_KEY_A,
-b, c, d, e, f, g, h, i, j, k, l, m,
-n, o, p, q, r, s, t, u, v, w, x, y, 
-z,
+    a = GLFW_KEY_A,
+    b, c, d, e, f, g, h, i, j, k, l, m,
+    n, o, p, q, r, s, t, u, v, w, x, y, 
+    z,
 
-escape = GLFW_KEY_ESCAPE,      
-enter,
-tab,
-backspace,
-insert,
-del,    
-right,
-left,        
-down,
-up,         
-page_up,
-page_down,
-home,    
-end,
+    escape = GLFW_KEY_ESCAPE,      
+    enter,
+    tab,
+    backspace,
+    insert,
+    del,    
+    right,
+    left,        
+    down,
+    up,         
+    page_up,
+    page_down,
+    home,    
+    end,
 
-caps_lock = GLFW_KEY_CAPS_LOCK,    
-scroll_lock,
-num_lock,     
-print_screen,
-pause,
+    caps_lock = GLFW_KEY_CAPS_LOCK,    
+    scroll_lock,
+    num_lock,     
+    print_screen,
+    pause,
 
-f1 = GLFW_KEY_F1,        
-f2, f3, f4, f5, f6, f7, f8, f9, f10, f11,
-f12,
+    f1 = GLFW_KEY_F1,        
+    f2, f3, f4, f5, f6, f7, f8, f9, f10, f11,
+    f12,
 
-num_0 = GLFW_KEY_KP_0,    
-num_1, num_2, num_3, num_4,
-num_5, num_6, num_7, num_8,
-num_9,
+    num_0 = GLFW_KEY_KP_0,    
+    num_1, num_2, num_3, num_4,
+    num_5, num_6, num_7, num_8,
+    num_9,
 
-num_decimal,    
-num_divide,    
-num_multiply,
-num_subtract,
-num_add,
-num_enter,       
-num_equal,
+    num_decimal,    
+    num_divide,    
+    num_multiply,
+    num_subtract,
+    num_add,
+    num_enter,       
+    num_equal,
 
-left_shift = GLFW_KEY_LEFT_SHIFT,
-left_ctrl,
-left_alt,     
-left_super,
+    left_shift = GLFW_KEY_LEFT_SHIFT,
+    left_ctrl,
+    left_alt,     
+    left_super,
 
-right_shift,
-right_ctrl,
-right_alt,    
-right_super,
+    right_shift,
+    right_ctrl,
+    right_alt,    
+    right_super,
 };
 
 #endif
