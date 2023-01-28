@@ -17,10 +17,10 @@ int main()
     Camera camera;
 
 
-    bool isW = false, isA = false, isS = false, isD = false;
     camera.isActive = false;
     camera.isCaptured = false;
     camera._speed = 5.f;
+    bool isClicked = false;
     while(window.is_open())
     {
         auto elapsedTime = window.elapsed_time();
@@ -28,24 +28,21 @@ int main()
         //processing input
         window.poll_events();
 
-        //camera movement
-        glm::vec3 move_offset(0.f);
 
-        if (window.is_mouse_clicked() && !camera.isCaptured)
-            camera.isCaptured = camera.isActive = true;
-        else if (window.is_mouse_clicked() && camera.isCaptured)
-            camera.isCaptured = camera.isActive = false;
-        
-        if (!window.is_mouse_clicked())
+        if (window.is_mouse_clicked())
+            isClicked = true;
+
+        if (!window.is_mouse_clicked() && isClicked)
         {
-            if(camera.isCaptured)
+            if (camera.isCaptured = !camera.isCaptured)
                 window.set_cursor_mode(Window::cursor_modes::disabled);
             else
                 window.set_cursor_mode(Window::cursor_modes::normal);
-        }
-        
+            
 
-        if (camera.isActive)
+            isClicked = false;
+        }
+        if (camera.isCaptured)
         {
             auto[cursor_xoffset, cursor_yoffset] = window.get_mouse_offset();
             camera.ProcessMouseMovement(-cursor_xoffset, cursor_yoffset);
@@ -55,19 +52,15 @@ int main()
         if (window.is_key_pressed(Window::key::q))
             window.close();
 
-        if (isW = !isW && window.is_key_pressed(Window::key::w))
-            move_offset -= camera.get_dir();
-        if (isA = !isA && window.is_key_pressed(Window::key::a))
-            move_offset += camera.get_right();
-        if (isS = !isS && window.is_key_pressed(Window::key::s))
-            move_offset += camera.get_dir();
-        if (isD = !isD && window.is_key_pressed(Window::key::d))
-            move_offset -= camera.get_right();
-        
-        move_offset *= camera._speed * elapsedTime;
-
-        camera.move(move_offset);
-
+        float velocity = elapsedTime * camera._speed;
+        if (window.is_key_pressed(Window::key::w))
+            camera.move(-camera.get_dir() * velocity);
+        if (window.is_key_pressed(Window::key::a))
+            camera.move( camera.get_right() * velocity);
+        if (window.is_key_pressed(Window::key::s))
+            camera.move( camera.get_dir() * velocity);
+        if (window.is_key_pressed(Window::key::d))
+            camera.move(-camera.get_right() * velocity);
 
         //rendering
         window.clear_src(glm::vec3(0.f, 0.f, 0.f));
