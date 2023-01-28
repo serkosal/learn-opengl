@@ -1,5 +1,7 @@
-#build folder
+#build folder and scripts
 builds
+*.sh
+*.log
 
 #IDE config folder
 .vscode
