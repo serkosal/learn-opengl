@@ -17,7 +17,6 @@ int main()
     Camera camera;
 
 
-    camera.isActive = false;
     camera.isCaptured = false;
     camera._speed = 5.f;
     bool isClicked = false;
@@ -25,9 +24,14 @@ int main()
     {
         auto elapsedTime = window.elapsed_time();
         
+        backpack._trans = glm::rotate(
+            backpack._trans,
+            float(glm::radians(22.5f * elapsedTime)),
+            glm::vec3(0.f, 1.f, 0.f)
+        );
+
         //processing input
         window.poll_events();
-
 
         if (window.is_mouse_clicked())
             isClicked = true;
@@ -61,11 +65,15 @@ int main()
             camera.move( camera.get_dir() * velocity);
         if (window.is_key_pressed(Window::key::d))
             camera.move(-camera.get_right() * velocity);
+        if (window.is_key_pressed(Window::key::space))
+            camera.move(-camera.get_up() * velocity);
+        if (window.is_key_pressed(Window::key::left_shift))
+            camera.move(camera.get_up() * velocity);
 
         //rendering
         window.clear_src(glm::vec3(0.f, 0.f, 0.f));
 
-        backpack.draw(shader_basic, camera.get_view(), camera.get_proj(window.aspect_ratio()));
+        backpack.draw(camera, shader_basic, window.aspect_ratio());
 
         window.blit_scr();
     }

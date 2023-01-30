@@ -3,13 +3,14 @@
 #define MODEL_HPP
 
 
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "mesh.hpp"
 #include "texture.hpp"
 #include "shader.hpp"
+#include "camera.hpp"
 
 #include <vector>
 #include <filesystem>
@@ -19,7 +20,6 @@
 class Model
 {
 private:
-    
     std::vector<Mesh> _meshes;
     std::filesystem::path _path;
 
@@ -38,28 +38,40 @@ private:
             mat.d1, mat.d2, mat.d3, mat.d4
         );
     }
-public:
-
-    Model(const std::filesystem::path &path, bool standart_dir=true);
 
     void process_node(aiNode* node, const aiScene* scene, const glm::mat4& trans = glm::mat4(1.f));
     void process_mesh(aiMesh* mesh, const aiScene* scene,  const glm::mat4& trans);
+public:
+    glm::mat4 _trans = glm::mat4(1.f);
+
+    Model(const std::filesystem::path &path, bool standart_dir=true);
 
     void draw(
+        const Camera& camera,
         const Shader& shader,
-        const glm::mat4& view,
-        const glm::mat4& projection) const
+        float aspect_ratio = 1.f
+    )
     {
         shader.use();
+
+        glActiveTexture(GL_TEXTURE0);
         _diffuse.bind();
-        shader.setMat4("model", glm::mat4(1.f));
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
+        shader.setInt("diffuse_text", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        _specular.bind();
+        shader.setInt("specular_text", 1);
+
+        shader.setMat4("model", _trans);
+        shader.setVec3("viewPos", camera._pos);
+        shader.setMat4("view", camera.get_view());
+        shader.setMat4("projection", camera.get_proj(aspect_ratio));
         for (const auto& mesh : _meshes)
         {
             mesh.draw();
         }
     }
+
     ~Model() = default;
 };
 
