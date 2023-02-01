@@ -22,7 +22,6 @@ class Model
 {
 private:
     std::vector<Mesh> _meshes;
-    std::filesystem::path _path;
 
     static std::filesystem::path directory;
     std::ofstream model_log;
@@ -48,7 +47,11 @@ private:
 public:
     glm::mat4 _trans = glm::mat4(1.f);
 
-    Model(const std::filesystem::path &path, bool standart_dir=true);
+    Model(
+        const std::filesystem::path &path,
+        bool flipUV=false,
+        bool standart_dir=true
+    );
 
     void draw(
         const Camera& camera,
@@ -89,12 +92,15 @@ public:
     ~Model() = default;
 };
 
-Model::Model(const std::filesystem::path& path, bool standart_dir)
-: _path(path)
+Model::Model(const std::filesystem::path& path, bool flipUV, bool standart_dir)
 {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(directory / path, 
-    aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph);
+
+    auto postprocess = aiProcess_Triangulate | 
+    aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_GenNormals;
+    postprocess |= flipUV ? aiProcess_FlipUVs : 0;
+
+    const aiScene *scene = import.ReadFile(directory / path, postprocess);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
@@ -111,19 +117,19 @@ Model::Model(const std::filesystem::path& path, bool standart_dir)
             material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
             std::string Str(str.C_Str());
             if (_diffuse_dict.count(Str) == 0)
-                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, true, false);
+                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, false, false);
         }
         if (material->GetTextureCount(aiTextureType_SPECULAR))
         {
             material->GetTexture(aiTextureType_SPECULAR, 0, &str);
             std::string Str(str.C_Str());
             if (_diffuse_dict.count(Str) == 0)
-                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, true, false);
+                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, false, false);
         }
     }
 
     auto* rootNode = scene->mRootNode;
-    process_node(rootNode, scene, glm::mat4(1.f));
+    process_node(rootNode, scene, convertMatrix(rootNode->mTransformation));
 
     model_log.close();
 }
@@ -207,7 +213,7 @@ void Model::process_mesh(aiMesh* mesh, const aiScene* scene, const glm::mat4& tr
     }
 
     _meshes.push_back(Mesh(vertices, indices));
-    //_meshes.back()._trans = trans;
+    _meshes.back()._trans = trans;
 }
 
 std::filesystem::path Model::directory = "../resources/models/";

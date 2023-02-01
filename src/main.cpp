@@ -12,7 +12,13 @@ int main()
 
     Shader shader_basic("basic");
 
-    Model backpack("backpack/backpack.obj");
+    //Model backpack("backpack/backpack.obj", true);
+    Model backpack("survival_guitar_backpack/scene.gltf");
+    backpack._trans = glm::rotate(
+            backpack._trans,
+            glm::radians(-90.f),
+            glm::vec3(1.f, 0.f, 0.f)
+    );
 
     Camera camera;
 
@@ -24,11 +30,11 @@ int main()
     {
         auto elapsedTime = window.elapsed_time();
         
-        backpack._trans = glm::rotate(
-            backpack._trans,
-            float(glm::radians(22.5f * elapsedTime)),
-            glm::vec3(0.f, 1.f, 0.f)
-        );
+        // backpack._trans = glm::rotate(
+        //     backpack._trans,
+        //     float(glm::radians(22.5f * elapsedTime)),
+        //     glm::vec3(0.f, 1.f, 0.f)
+        // );
 
         //processing input
         window.poll_events();
