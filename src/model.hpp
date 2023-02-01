@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <string>
 
 class Model
 {
@@ -26,8 +27,11 @@ private:
     static std::filesystem::path directory;
     std::ofstream model_log;
 
-    Texture _diffuse;
-    Texture _specular;
+    std::map<std::string, Texture> _diffuse_dict;
+    std::map<std::string, Texture> _specular_dict;
+
+    std::map<size_t, Texture*> _diffuse_mapping;
+    std::map<size_t, Texture*> _specular_mapping;
 
     glm::mat4 convertMatrix(aiMatrix4x4 mat)
     {
@@ -54,21 +58,31 @@ public:
     {
         shader.use();
 
-        glActiveTexture(GL_TEXTURE0);
-        _diffuse.bind();
-        shader.setInt("diffuse_text", 0);
-
-        glActiveTexture(GL_TEXTURE1);
-        _specular.bind();
-        shader.setInt("specular_text", 1);
-
         shader.setMat4("model", _trans);
         shader.setVec3("viewPos", camera._pos);
         shader.setMat4("view", camera.get_view());
         shader.setMat4("projection", camera.get_proj(aspect_ratio));
-        for (const auto& mesh : _meshes)
+        shader.setInt("specular_text", 1);
+        shader.setInt("diffuse_text", 0);
+        for (size_t i = 0; i < _meshes.size(); ++i)
         {
-            mesh.draw();
+            if(_diffuse_mapping.count(i))
+            {
+                glActiveTexture(GL_TEXTURE0);
+                _diffuse_mapping[i]->bind();
+            }
+            if(_specular_mapping.count(i))
+            {
+                glActiveTexture(GL_TEXTURE1);
+                _specular_mapping[i]->bind();
+            }
+
+            _meshes[i].draw();
+
+            if(_diffuse_mapping.count(i))
+                _diffuse_mapping[i]->unbind();
+            if(_specular_mapping.count(i))
+                _specular_mapping[i]->unbind();
         }
     }
 
@@ -76,6 +90,7 @@ public:
 };
 
 Model::Model(const std::filesystem::path& path, bool standart_dir)
+: _path(path)
 {
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(directory / path, 
@@ -87,8 +102,25 @@ Model::Model(const std::filesystem::path& path, bool standart_dir)
     }
     model_log.open("model.log", std::ios_base::trunc);
 
-    _diffuse.init("../resources/models/backpack/diffuse.jpg", false, false);
-    _specular.init("../resources/models/backpack/specular.jpg", false, false);
+    for (size_t i = 0; i < scene->mNumMaterials; ++i)
+    {
+        auto material = scene->mMaterials[i];
+        aiString str;
+        if (material->GetTextureCount(aiTextureType_DIFFUSE))
+        {
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+            std::string Str(str.C_Str());
+            if (_diffuse_dict.count(Str) == 0)
+                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, true, false);
+        }
+        if (material->GetTextureCount(aiTextureType_SPECULAR))
+        {
+            material->GetTexture(aiTextureType_SPECULAR, 0, &str);
+            std::string Str(str.C_Str());
+            if (_diffuse_dict.count(Str) == 0)
+                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, true, false);
+        }
+    }
 
     auto* rootNode = scene->mRootNode;
     process_node(rootNode, scene, glm::mat4(1.f));
@@ -154,6 +186,24 @@ void Model::process_mesh(aiMesh* mesh, const aiScene* scene, const glm::mat4& tr
         model_log << indices[i+1] << " "; 
         model_log << indices[i+2] << " ";
         model_log << '\n';
+    }
+
+    if (mesh->mMaterialIndex >= 0)
+    {
+        auto material = scene->mMaterials[mesh->mMaterialIndex];
+        aiString str;
+        if (material->GetTextureCount(aiTextureType_DIFFUSE))
+        {
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+            std::string Str(str.C_Str());
+            _diffuse_mapping[_meshes.size()] = &_diffuse_dict[Str];
+        }
+        if (material->GetTextureCount(aiTextureType_SPECULAR))
+        {
+            material->GetTexture(aiTextureType_SPECULAR, 0, &str);
+            std::string Str(str.C_Str());
+            _specular_mapping[_meshes.size()] = &_specular_dict[Str];
+        }
     }
 
     _meshes.push_back(Mesh(vertices, indices));
