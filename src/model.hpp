@@ -123,8 +123,8 @@ Model::Model(const std::filesystem::path& path, bool flipUV, bool standart_dir)
         {
             material->GetTexture(aiTextureType_SPECULAR, 0, &str);
             std::string Str(str.C_Str());
-            if (_diffuse_dict.count(Str) == 0)
-                _diffuse_dict[Str] = Texture(directory / path.parent_path() / Str, false, false);
+            if (_specular_dict.count(Str) == 0)
+                _specular_dict[Str] = Texture(directory / path.parent_path() / Str, false, false);
         }
     }
 
