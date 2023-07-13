@@ -1,5 +1,8 @@
 # Learn openGL
-The openGL project based on tutorials from https://learnopengl.com/ 
+The openGL project based on tutorials from https://learnopengl.com/
+
+Now this repository is deprecated check out new one https://github.com/serkosal/skgl/
+
 
 ## How to build
 go to the directory src/ and run the following command:
